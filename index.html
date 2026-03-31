@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deutsch Trainer – Klasse 6</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f7f4ef;
+  --surface: #ffffff;
+  --surface2: #f0ece4;
+  --border: #e0d8cc;
+  --text: #1a1612;
+  --muted: #7a6f63;
+  --blue: #2563a8;
+  --blue-light: #dbeafe;
+  --green: #1a7a4a;
+  --green-light: #d1fae5;
+  --orange: #c25e10;
+  --orange-light: #fff3e0;
+  --red: #b91c1c;
+  --red-light: #fee2e2;
+  --purple: #6d28d9;
+  --purple-light: #ede9fe;
+  --accent: #e85d2a;
+  --radius: 12px;
+  --shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+/* LAYOUT */
+.app { display: grid; grid-template-columns: 260px 1fr; min-height: 100vh; }
+.sidebar { background: var(--text); color: #fff; padding: 0; position: sticky; top: 0; height: 100vh; overflow-y: auto; display: flex; flex-direction: column; }
+.sidebar-header { padding: 24px 20px 16px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+.sidebar-header h1 { font-size: 18px; font-weight: 800; letter-spacing: -0.3px; color: #fff; }
+.sidebar-header p { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 3px; }
+.progress-global { padding: 14px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+.progress-global .label { font-size: 11px; color: rgba(255,255,255,0.5); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+.prog-bar { background: rgba(255,255,255,0.15); border-radius: 20px; height: 6px; overflow: hidden; }
+.prog-fill { height: 100%; border-radius: 20px; background: #4ade80; transition: width 0.4s ease; }
+.prog-text { font-size: 12px; color: rgba(255,255,255,0.6); margin-top: 5px; }
+.week-section { padding: 12px 0; }
+.week-label { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 1px; padding: 0 20px 6px; }
+.day-btn { display: flex; align-items: center; gap: 10px; width: 100%; padding: 8px 20px; background: none; border: none; color: rgba(255,255,255,0.65); cursor: pointer; font-family: 'Nunito', sans-serif; font-size: 13px; text-align: left; transition: all 0.15s; position: relative; }
+.day-btn:hover { background: rgba(255,255,255,0.07); color: #fff; }
+.day-btn.active { background: rgba(255,255,255,0.12); color: #fff; }
+.day-btn.active::before { content: ''; position: absolute; left: 0; top: 4px; bottom: 4px; width: 3px; background: #4ade80; border-radius: 0 2px 2px 0; }
+.day-btn.rest-day { color: rgba(255,255,255,0.35); }
+.day-num { width: 22px; height: 22px; border-radius: 50%; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; }
+.day-btn.completed .day-num { background: #4ade80; color: #1a1612; }
+.day-btn.active .day-num { background: #fff; color: #1a1612; }
+.day-info { flex: 1; min-width: 0; }
+.day-info .day-name { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.day-info .day-topic { font-size: 11px; color: rgba(255,255,255,0.4); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.day-btn.completed .day-info .day-topic { color: rgba(74,222,128,0.7); }
+
+/* MAIN */
+.main { padding: 32px 40px; max-width: 800px; }
+.day-header-bar { margin-bottom: 28px; }
+.day-header-bar .week-tag { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+.day-header-bar h2 { font-size: 28px; font-weight: 800; color: var(--text); letter-spacing: -0.5px; line-height: 1.2; }
+.day-header-bar .subtitle { font-size: 14px; color: var(--muted); margin-top: 6px; }
+.type-badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; margin-top: 8px; }
+.type-theory { background: var(--blue-light); color: var(--blue); }
+.type-writing { background: var(--green-light); color: var(--green); }
+.type-grammar { background: var(--purple-light); color: var(--purple); }
+.type-test { background: var(--orange-light); color: var(--orange); }
+.type-rest { background: var(--surface2); color: var(--muted); }
+
+/* CARDS */
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 24px; margin-bottom: 16px; box-shadow: var(--shadow); }
+.card-title { font-size: 13px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; display: flex; align-items: center; gap: 7px; }
+.card-title .icon { font-size: 15px; }
+.lesson-text { font-size: 15px; line-height: 1.7; color: var(--text); font-family: 'Crimson Pro', serif; }
+.lesson-text strong { font-family: 'Nunito', sans-serif; font-weight: 700; }
+
+.example-block { background: var(--blue-light); border-left: 4px solid var(--blue); border-radius: 0 8px 8px 0; padding: 14px 18px; margin: 12px 0; font-size: 14px; line-height: 1.8; }
+.rule-block { background: var(--green-light); border-left: 4px solid var(--green); border-radius: 0 8px 8px 0; padding: 14px 18px; margin: 12px 0; font-size: 14px; line-height: 1.8; }
+.rule-block .rule-item { display: flex; gap: 8px; margin-bottom: 6px; }
+.rule-block .rule-num { font-weight: 800; color: var(--green); flex-shrink: 0; }
+.tip-block { background: var(--orange-light); border-left: 4px solid var(--orange); border-radius: 0 8px 8px 0; padding: 12px 16px; margin: 12px 0; font-size: 13px; color: var(--orange); }
+.mistake-block { background: var(--red-light); border-radius: 8px; padding: 12px 16px; margin: 10px 0; font-size: 14px; }
+.mistake-block .wrong { color: var(--red); text-decoration: line-through; }
+.mistake-block .right { color: var(--green); font-weight: 700; }
+
+/* EXERCISES */
+.exercise-card { background: var(--surface); border: 2px solid var(--border); border-radius: var(--radius); padding: 20px 24px; margin-bottom: 16px; transition: border-color 0.2s; }
+.exercise-card.active-ex { border-color: var(--blue); }
+.exercise-card.submitted { border-color: var(--green); background: #f0fdf4; }
+.ex-title { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+.ex-question { font-size: 14px; color: var(--muted); margin-bottom: 12px; line-height: 1.6; }
+textarea.answer-field { width: 100%; border: 1.5px solid var(--border); border-radius: 8px; padding: 12px 14px; font-family: 'Nunito', sans-serif; font-size: 14px; color: var(--text); background: var(--bg); resize: vertical; min-height: 100px; transition: border-color 0.2s; outline: none; }
+textarea.answer-field:focus { border-color: var(--blue); }
+input.answer-field-inline { border: none; border-bottom: 2px solid var(--border); background: transparent; font-family: 'Nunito', sans-serif; font-size: 14px; color: var(--text); padding: 2px 6px; min-width: 100px; outline: none; transition: border-color 0.2s; }
+input.answer-field-inline:focus { border-bottom-color: var(--blue); }
+.fill-line { font-size: 14px; line-height: 2.5; margin-bottom: 4px; color: var(--text); }
+.submit-btn { display: inline-flex; align-items: center; gap: 7px; padding: 10px 20px; background: var(--text); color: #fff; border: none; border-radius: 8px; font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.15s; margin-top: 12px; }
+.submit-btn:hover { background: var(--accent); transform: translateY(-1px); }
+.submit-btn:disabled { background: var(--muted); cursor: not-allowed; transform: none; }
+.submit-btn .spinner { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* AI FEEDBACK */
+.feedback-box { margin-top: 14px; border-radius: 10px; overflow: hidden; }
+.feedback-header { padding: 10px 16px; font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 7px; }
+.feedback-body { padding: 14px 18px; font-size: 14px; line-height: 1.75; white-space: pre-wrap; }
+.feedback-good { }
+.feedback-good .feedback-header { background: var(--green); color: #fff; }
+.feedback-good .feedback-body { background: var(--green-light); color: #064e2a; }
+.feedback-ok .feedback-header { background: var(--orange); color: #fff; }
+.feedback-ok .feedback-body { background: var(--orange-light); color: #7a3a00; }
+.feedback-retry .feedback-header { background: var(--red); color: #fff; }
+.feedback-retry .feedback-body { background: var(--red-light); color: #7f1d1d; }
+
+/* DAY COMPLETE */
+.day-complete-banner { background: linear-gradient(135deg, var(--green) 0%, #0a5c35 100%); border-radius: var(--radius); padding: 24px 28px; text-align: center; margin-top: 8px; }
+.day-complete-banner h3 { color: #fff; font-size: 20px; font-weight: 800; margin-bottom: 6px; }
+.day-complete-banner p { color: rgba(255,255,255,0.8); font-size: 14px; }
+.next-day-btn { display: inline-flex; align-items: center; gap: 7px; padding: 10px 24px; background: #fff; color: var(--green); border: none; border-radius: 8px; font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 800; cursor: pointer; margin-top: 14px; transition: all 0.15s; }
+.next-day-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+
+/* REST DAY */
+.rest-screen { text-align: center; padding: 60px 20px; }
+.rest-screen .emoji { font-size: 64px; margin-bottom: 16px; }
+.rest-screen h3 { font-size: 24px; font-weight: 800; margin-bottom: 8px; }
+.rest-screen p { font-size: 15px; color: var(--muted); max-width: 380px; margin: 0 auto; line-height: 1.6; }
+
+/* MCQ */
+.mcq-option { display: flex; align-items: flex-start; gap: 10px; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 8px; margin-bottom: 8px; cursor: pointer; transition: all 0.15s; font-size: 14px; }
+.mcq-option:hover { border-color: var(--blue); background: var(--blue-light); }
+.mcq-option.selected { border-color: var(--blue); background: var(--blue-light); }
+.mcq-option.correct { border-color: var(--green); background: var(--green-light); }
+.mcq-option.wrong { border-color: var(--red); background: var(--red-light); }
+.mcq-dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--border); flex-shrink: 0; margin-top: 1px; transition: all 0.15s; }
+.mcq-option.selected .mcq-dot { border-color: var(--blue); background: var(--blue); }
+.mcq-option.correct .mcq-dot { border-color: var(--green); background: var(--green); }
+.mcq-option.wrong .mcq-dot { border-color: var(--red); background: var(--red); }
+
+@media (max-width: 720px) {
+  .app { grid-template-columns: 1fr; }
+  .sidebar { position: relative; height: auto; }
+  .main { padding: 20px 16px; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <h1>Deutsch Trainer</h1>
+    <p>Klasse 6 · Vorgangsbeschreibung</p>
+  </div>
+  <div class="progress-global">
+    <div class="label">Gesamtfortschritt</div>
+    <div class="prog-bar"><div class="prog-fill" id="global-prog" style="width:0%"></div></div>
+    <div class="prog-text" id="global-prog-text">0 von 14 Tagen abgeschlossen</div>
+  </div>
+  <div id="sidebar-days"></div>
+</aside>
+
+<!-- MAIN -->
+<main class="main" id="main-content"></main>
+
+</div>
+
+<script>
+// ─── DATA ───────────────────────────────────────────────────────────────────
+const DAYS = [
+  // WEEK 1
+  {
+    id:1, week:1, weekday:"Montag", title:"Was ist eine Vorgangsbeschreibung?", type:"theory",
+    intro:`Eine <strong>Vorgangsbeschreibung</strong> erklärt Schritt für Schritt, wie etwas gemacht wird — zum Beispiel: Wie backt man einen Kuchen? Wie repariert man ein Fahrrad? Wie macht man einen Rucksack fertig?<br><br>Das ist <strong>kein Erlebnisaufsatz!</strong> Du schreibst keine Geschichte über dich selbst. Du erklärst einen Vorgang sachlich und klar.`,
+    rules:[
+      "Immer Präsens (Gegenwart): man nimmt / man legt / man schneidet",
+      "Immer 'man' oder Passiv — KEIN 'ich' oder 'wir'",
+      "Schritte in der richtigen Reihenfolge",
+      "Verbindungswörter: zuerst / dann / danach / anschließend / zum Schluss",
+      "Klare, genaue Sprache — kein 'irgendwie' oder 'vielleicht'"
+    ],
+    example:`<strong>Einleitung:</strong> Im Folgenden wird beschrieben, wie man ... macht.<br><strong>Hauptteil:</strong> Zuerst ... Dann ... Danach ... Anschließend ...<br><strong>Schluss:</strong> Wenn alles richtig gemacht wurde, ...`,
+    exercises:[
+      { id:"1a", type:"mcq", question:"Welche Zeitform benutzt man in der Vorgangsbeschreibung?",
+        options:["Präteritum — ich lief, ich kam","Präsens — man nimmt, man mischt","Futur — man wird nehmen","Perfekt — man hat genommen"],
+        correct:1, feedback_correct:"Richtig! Präsens mit 'man' ist die Grundregel.", feedback_wrong:"Nicht ganz! In der Vorgangsbeschreibung benutzt man immer Präsens: man nimmt, man mischt, man legt." },
+      { id:"1b", type:"mcq", question:"Welcher Satz gehört zu einer Vorgangsbeschreibung?",
+        options:["Ich war so aufgeregt, als ich das sah!","Plötzlich passierte etwas Seltsames.","Zuerst nimmt man zwei Scheiben Brot.","Mein Herz klopfte vor Aufregung."],
+        correct:2, feedback_correct:"Super! 'Zuerst nimmt man...' — Präsens + man + Verbindungswort = perfekt.", feedback_wrong:"Nein! Sätze mit 'ich', 'plötzlich' oder Gefühlen gehören zur Erlebniserzählung, nicht zur Vorgangsbeschreibung." },
+      { id:"1c", type:"text", question:"Schreibe die 5 Regeln der Vorgangsbeschreibung aus dem Gedächtnis auf (auf Deutsch):", placeholder:"1. ...\n2. ...\n3. ...\n4. ...\n5. ...", aiCheck:true, aiPrompt:`Der Schüler ist in Klasse 6 und übt Vorgangsbeschreibung. Er soll die 5 Regeln aufschreiben: 1. Präsens, 2. man/Passiv (kein ich/wir), 3. richtige Reihenfolge, 4. Verbindungswörter, 5. klare genaue Sprache. Bewerte seine Antwort auf Deutsch, locker und ermutigend. Sag welche Regeln er hat und welche fehlen. Max 4 Sätze.` }
+    ]
+  },
+  {
+    id:2, week:1, weekday:"Dienstag", title:"Präsens mit 'man' — Verben üben", type:"grammar",
+    intro:`In der Vorgangsbeschreibung benutzt du <strong>immer Präsens + man</strong>. Das klingt dann so: <em>"man nimmt, man schneidet, man legt."</em><br><br>Achtung bei starken Verben — die ändern ihren Stammvokal!`,
+    example:`man nehmen → man <strong>nimmt</strong><br>man schneiden → man <strong>schneidet</strong><br>man lassen → man <strong>lässt</strong><br>man fahren → man <strong>fährt</strong><br>man geben → man <strong>gibt</strong><br>man halten → man <strong>hält</strong>`,
+    exercises:[
+      { id:"2a", type:"fill", question:"Schreibe das Verb richtig (Präsens mit 'man'):",
+        items:[
+          { template:"man (kochen) →  man", answer:"kocht" },
+          { template:"man (waschen) →  man", answer:"wäscht" },
+          { template:"man (falten) →  man", answer:"faltet" },
+          { template:"man (halten) →  man", answer:"hält" },
+          { template:"man (tragen) →  man", answer:"trägt" },
+        ]},
+      { id:"2b", type:"text", question:"Schreibe 5 eigene Sätze mit 'man + Verb im Präsens' über das Thema Fahrradfahren. Jeder Satz soll mit einem Verbindungswort beginnen (zuerst / dann / danach ...):", placeholder:"Zuerst man ...\nDann man ...\n...", aiCheck:true, aiPrompt:`Klasse 6, Vorgangsbeschreibung. Der Schüler soll 5 Sätze mit 'man + Präsens' über Fahrradfahren schreiben, mit Verbindungswörtern. Prüfe: stimmt die Zeitform (Präsens)? Werden Verbindungswörter benutzt? Ist 'man' dabei? Gib kurzes Feedback auf Deutsch, freundlich und klar. Zeige wo Fehler sind und wie man sie verbessert. Max 5 Sätze Feedback.` }
+    ]
+  },
+  {
+    id:3, week:1, weekday:"Mittwoch", title:"Erste eigene Vorgangsbeschreibung", type:"writing",
+    intro:`Heute schreibst du deine <strong>erste eigene Vorgangsbeschreibung</strong>! Lies zuerst den Mustertext und analysiere ihn — dann schreibst du selbst.`,
+    example:`<strong>Mustertext: Wie macht man einen Pfannkuchen?</strong><br><br>Im Folgenden wird beschrieben, wie man einen Pfannkuchen backt.<br><br><u>Zuerst</u> vermengt man 100 g Mehl, zwei Eier und 200 ml Milch. <u>Dann</u> rührt man alles glatt. <u>Anschließend</u> lässt man den Teig zehn Minuten ruhen.<br><br><u>Danach</u> erhitzt man Butter in einer Pfanne. <u>Sobald</u> die Butter heiß ist, gießt man Teig hinein.<br><br><u>Zum Schluss</u> wendet man den Pfannkuchen. Wenn alles richtig gemacht wurde, ist er goldbraun.`,
+    exercises:[
+      { id:"3a", type:"mcq", question:"Wie viele Verbindungswörter hat der Mustertext?",
+        options:["2","4","5","7"],
+        correct:2, feedback_correct:"Genau! Zuerst / Dann / Anschließend / Danach / Sobald / Zum Schluss — 6 Verbindungswörter!", feedback_wrong:"Zähl nochmal! Zuerst / Dann / Anschließend / Danach / Sobald / Zum Schluss — das sind 6!" },
+      { id:"3b", type:"text", question:"Schreibe deine eigene Vorgangsbeschreibung!\n\nThema: Wie packt man einen Schulrucksack?\n\nMindestens 6 Sätze · Einleitung + Hauptteil + Schluss · Mindestens 4 Verbindungswörter · Immer Präsens mit 'man'", placeholder:"Im Folgenden wird beschrieben, wie man ...\n\nZuerst ...\nDann ...\nDanach ...\n...\nWenn alles richtig gemacht wurde, ...", aiCheck:true, aiPrompt:`Du bist Deutschlehrer für Klasse 6. Der Schüler hat eine Vorgangsbeschreibung über das Packen eines Schulrucksacks geschrieben. Bewerte auf Deutsch:\n1. Note (1-6)\n2. Was gut ist (1-2 Punkte)\n3. Was noch verbessert werden muss (konkrete Fehler mit Beispiel)\nSei ermutigend aber ehrlich. Prüfe: Präsens, 'man', Verbindungswörter, Einleitung, Schluss, Rechtschreibung. Max 8 Sätze.` }
+    ]
+  },
+  {
+    id:4, week:1, weekday:"Donnerstag", title:"Rechtschreibung — häufige Fehler", type:"grammar",
+    intro:`Die Lehrerin hat in deinem Text <strong>Rechtschreibfehler (R)</strong> markiert. Heute lernst du die Wörter, die in Vorgangsbeschreibungen oft falsch geschrieben werden.`,
+    example:`<strong>anschließend</strong> — hat <em>ß</em> wie in "Schluss"<br><strong>schließlich</strong> — auch <em>ß</em><br><strong>währenddessen</strong> — ein Wort! (nicht "während dessen")<br><strong>nachdem</strong> — ein Wort! (nicht "nach dem")<br><strong>gleichmäßig</strong> — hat Umlaut <em>ä</em> und <em>ß</em>`,
+    exercises:[
+      { id:"4a", type:"fill", question:"Finde den Fehler und schreibe das Wort richtig:",
+        items:[
+          { template:"anschliessend  →", answer:"anschließend" },
+          { template:"Während dessen  →", answer:"währenddessen" },
+          { template:"schliesslich  →", answer:"schließlich" },
+          { template:"nach dem (als Konjunktion)  →", answer:"nachdem" },
+          { template:"gleichmässig  →", answer:"gleichmäßig" },
+        ]},
+      { id:"4b", type:"text", question:"Schreibe 5 Sätze für eine Vorgangsbeschreibung (Thema frei wählbar). Benutze in jedem Satz mindestens ein Wort aus der Liste oben (anschließend / schließlich / währenddessen / nachdem / gleichmäßig).", placeholder:"1. Zuerst ...\n2. Anschließend ...\n3. ...", aiCheck:true, aiPrompt:`Klasse 6. Der Schüler soll 5 Sätze schreiben und dabei die Wörter 'anschließend', 'schließlich', 'währenddessen', 'nachdem', 'gleichmäßig' benutzen. Prüfe: 1. Rechtschreibung dieser Wörter, 2. ob Präsens mit 'man' benutzt wird, 3. ob die Sätze sinnvoll sind. Klares Feedback auf Deutsch, max 5 Sätze.` }
+    ]
+  },
+  {
+    id:5, week:1, weekday:"Freitag", title:"Passiv — die sachliche Form", type:"grammar",
+    intro:`Im Passiv steht die <strong>Sache</strong> im Mittelpunkt, nicht die Person. Es klingt sehr sachlich und professionell — perfekt für die Vorgangsbeschreibung!<br><br>Formel: <strong>werden + Partizip II</strong>`,
+    example:`Aktiv: man schneidet das Brot → Passiv: <strong>Das Brot wird geschnitten.</strong><br>Aktiv: man mischt die Zutaten → Passiv: <strong>Die Zutaten werden gemischt.</strong><br>Aktiv: man legt es in die Form → Passiv: <strong>Es wird in die Form gelegt.</strong>`,
+    exercises:[
+      { id:"5a", type:"fill", question:"Schreibe den Passivsatz (werden + Partizip II):",
+        items:[
+          { template:"Man kocht das Wasser.  →  Das Wasser", answer:"wird gekocht" },
+          { template:"Man wäscht das Fahrrad.  →  Das Fahrrad", answer:"wird gewaschen" },
+          { template:"Man mischt die Zutaten.  →  Die Zutaten", answer:"werden gemischt" },
+          { template:"Man öffnet das Fenster.  →  Das Fenster", answer:"wird geöffnet" },
+        ]},
+      { id:"5b", type:"text", question:"Schreibe eine kurze Vorgangsbeschreibung zum Thema 'Zimmer aufräumen' (5–7 Sätze). Benutze mindestens 3 Passivsätze (wird ... / werden ...).", placeholder:"Im Folgenden wird beschrieben, wie man ein Zimmer aufräumt.\n\nZuerst werden ...\nDann wird ...\n...", aiCheck:true, aiPrompt:`Klasse 6. Thema: Zimmer aufräumen. Prüfe ob der Schüler mind. 3 korrekte Passivsätze (werden/wird + Partizip II) benutzt hat. Erkläre jeden Fehler kurz und konkret. Gib auch eine Note 1-6. Auf Deutsch, freundlich, max 6 Sätze.` }
+    ]
+  },
+  {
+    id:6, week:1, weekday:"Samstag", title:"Selbsttest — ohne Notizen!", type:"writing",
+    intro:`Heute testest du dich selbst — <strong>ohne Notizen</strong> und <strong>ohne nachzuschauen</strong>! Das ist wie eine echte Schulaufgabe. Sei ehrlich mit dir selbst.`,
+    example:`Checkliste für dich:<br>✦ Zeitform = Präsens (nimmt / mischt / legt)<br>✦ Pronomen = man (kein ich/wir)<br>✦ Mindestens 5 Verbindungswörter<br>✦ Einleitung + Hauptteil + Schluss<br>✦ Klare, genaue Sprache`,
+    exercises:[
+      { id:"6a", type:"text", question:"SELBSTTEST — Schreibe eine vollständige Vorgangsbeschreibung (ohne Notizen!).\n\nThema: Wie wäscht man ein Fahrrad?\n\nMindestens 8 Sätze · Einleitung + Hauptteil + Schluss · Mindestens 5 Verbindungswörter · Präsens mit 'man' und/oder Passiv", placeholder:"Im Folgenden wird beschrieben, wie man ein Fahrrad wäscht.\n\n...", aiCheck:true, aiPrompt:`Du bist ein Deutschlehrer für Klasse 6. Das ist ein Selbsttest-Text des Schülers. Bewerte streng aber fair:\n1. Note (1-6) mit kurzer Begründung\n2. Stärken (was gut gemacht wurde)\n3. Schwächen (konkrete Fehler: Zeitform? Verbindungswörter? Passiv? Rechtschreibung? Einleitung/Schluss?)\n4. Ein konkreter Verbesserungsvorschlag\nAuf Deutsch, max 10 Sätze, ermutigend.` }
+    ]
+  },
+  {
+    id:7, week:1, weekday:"Sonntag", title:"Ruhetag 🌟", type:"rest",
+    intro:"", example:"", exercises:[]
+  },
+  // WEEK 2
+  {
+    id:8, week:2, weekday:"Montag", title:"Wiederholung + starke Verben", type:"theory",
+    intro:`Woche 2 beginnt! Heute wiederholst du alles und lernst <strong>ausdrucksstarke Verben</strong> — die machen deine Texte viel lebendiger.`,
+    example:`<strong>Schwaches Verb → Starkes Verb:</strong><br>gehen → schreiten / laufen / treten<br>sagen → erklären / betonen / hinweisen<br>legen → platzieren / anordnen / aufbewahren<br>machen → herstellen / anfertigen / zusammensetzen<br>sehen → beobachten / überprüfen / kontrollieren`,
+    exercises:[
+      { id:"8a", type:"fill", question:"Ersetze das schwache Verb durch ein stärkeres (schreibe das Verbindungswort + Verb):",
+        items:[
+          { template:"Man geht zum nächsten Schritt.  →  Man", answer:"schreitet / gelangt" },
+          { template:"Man sagt die Anleitung vor.  →  Man", answer:"erklärt / erläutert" },
+          { template:"Man sieht den Fehler.  →  Man", answer:"erkennt / bemerkt" },
+          { template:"Man macht das Modell.  →  Man", answer:"stellt her / fertigt an" },
+        ]},
+      { id:"8b", type:"text", question:"Schnelle Wiederholung — beantworte diese 5 Fragen (ohne nachzuschauen!):\n1. Welche Zeitform in der Vorgangsbeschreibung?\n2. Welches Pronomen?\n3. Nenne 5 Verbindungswörter:\n4. Wie heißt die Passiv-Formel?\n5. Was sind die 3 Teile der Vorgangsbeschreibung?", placeholder:"1. ...\n2. ...\n3. ...\n4. ...\n5. ...", aiCheck:true, aiPrompt:`Klasse 6. Wiederholungsfragen über Vorgangsbeschreibung. Richtige Antworten: 1. Präsens 2. man (oder Passiv) 3. zuerst/dann/danach/anschließend/zum Schluss 4. werden + Partizip II 5. Einleitung + Hauptteil + Schluss. Prüfe und gib kurzes Feedback. Max 4 Sätze.` }
+    ]
+  },
+  {
+    id:9, week:2, weekday:"Dienstag", title:"Grammatiktest + lange Vorgangsbeschreibung", type:"grammar",
+    intro:`Heute machst du einen <strong>richtigen Grammatiktest</strong> und schreibst danach deine bisher längste Vorgangsbeschreibung!`,
+    example:`Noch mal die Passiv-Formen im Überblick:<br>einzel: <strong>wird</strong> + Partizip II (Das Brot <strong>wird</strong> geschnitten)<br>mehrzahl: <strong>werden</strong> + Partizip II (Die Zutaten <strong>werden</strong> gemischt)`,
+    exercises:[
+      { id:"9a", type:"fill", question:"Grammatiktest — schreibe das Verb richtig:",
+        items:[
+          { template:"Man ________ (nehmen) zunächst alle Zutaten.", answer:"nimmt" },
+          { template:"Das Wasser ________ (kochen) bei 100 Grad.", answer:"wird gekocht" },
+          { template:"Die Zutaten ________ (mischen) in einer Schüssel.", answer:"werden gemischt" },
+          { template:"Man ________ (lassen) den Teig 10 Minuten ruhen.", answer:"lässt" },
+          { template:"Das Ergebnis ________ (überprüfen) sorgfältig.", answer:"wird überprüft" },
+        ]},
+      { id:"9b", type:"text", question:"Schreibe deine bisher längste Vorgangsbeschreibung!\n\nThema: Wie bereitet man einen Rucksack für eine Wanderung vor?\n\nMindestens 10 Sätze · Benutze sowohl 'man + Verb' als auch Passivsätze · Starke Verben einbauen!", placeholder:"Im Folgenden wird beschrieben, wie man ...\n\n...", aiCheck:true, aiPrompt:`Deutschlehrer Klasse 6. Der Schüler soll 10+ Sätze schreiben, 'man + Präsens' und Passiv kombinieren, starke Verben benutzen. Gib Note 1-6 + Was ist gut + Was fehlt noch + 1 Beispielsatz der zeigt wie es besser geht. Auf Deutsch, ermutigend, max 8 Sätze.` }
+    ]
+  },
+  {
+    id:10, week:2, weekday:"Mittwoch", title:"Fehleranalyse — was die Lehrerin markiert hat", type:"theory",
+    intro:`Heute schaust du dir genau an, <strong>was die Lehrerin in deinem alten Text markiert hat</strong> und übst gezielt diese Fehlerarten.`,
+    example:`<strong>T = Tempus</strong> → Falsche Zeitform. Immer Präsens!<br><strong>A = Ausdruck</strong> → Schwacher Ausdruck. Stärkere Verben!<br><strong>Sr = Satzbau</strong> → Verb an die falsche Position.<br><strong>Wc = Wortwahl</strong> → Falsches Wort gewählt.<br><strong>R = Rechtschreibung</strong> → Tippfehler, ß/ss, Umlaute.`,
+    exercises:[
+      { id:"10a", type:"fill", question:"Korrigiere jeden Satz — finde und berichtige den Fehler:",
+        items:[
+          { template:"Man nehmt das Brot aus dem Regal.  →  Man", answer:"nimmt" },
+          { template:"Ich schneide das Gemüse.  →  Man", answer:"schneidet" },
+          { template:"Anschliessend wird alles gewaschen.  →", answer:"Anschließend" },
+          { template:"Die Zutaten werden zusammen gebracht.  →  werden", answer:"zusammengebracht" },
+        ]},
+      { id:"10b", type:"text", question:"Schreibe eine Vorgangsbeschreibung zum Thema deiner Wahl (mindestens 8 Sätze). Danach schreibe DARUNTER deine eigene Checkliste: Was hast du überprüft?", placeholder:"Meine Vorgangsbeschreibung:\n\n...\n\n---\nMeine Checkliste:\n☑ Präsens mit 'man' benutzt\n☑ ...", aiCheck:true, aiPrompt:`Klasse 6. Der Schüler schreibt eine Vorgangsbeschreibung + eigene Checkliste. Bewerte beides: 1. Text (Note + Fehler), 2. Checkliste (vollständig?). Besonders achten auf T/A/Sr/Wc/R Fehler wie ein Deutschlehrer. Auf Deutsch, max 8 Sätze.` }
+    ]
+  },
+  {
+    id:11, week:2, weekday:"Donnerstag", title:"Wortschatz — alle wichtigen Wörter", type:"grammar",
+    intro:`Heute lernst du den <strong>vollständigen Wortschatz</strong> für die Vorgangsbeschreibung. Diese Wörter musst du sicher schreiben können!`,
+    example:`<strong>Verbindungswörter:</strong> zuerst · zunächst · dann · daraufhin · danach · anschließend · im nächsten Schritt · währenddessen · sobald · nachdem · abschließend · zum Schluss · schließlich<br><br><strong>Starke Verben:</strong> entnehmen · vermengen · erhitzen · befestigen · überprüfen · kontrollieren · platzieren · anordnen`,
+    exercises:[
+      { id:"11a", type:"fill", question:"Fülle die Lücken mit dem passenden Verbindungswort aus der Liste:",
+        items:[
+          { template:"________ nimmt man alle Zutaten.", answer:"Zuerst" },
+          { template:"________ wird der Teig gemischt.", answer:"Dann / Danach / Anschließend" },
+          { template:"________ der Ofen heiß ist, legt man den Kuchen hinein.", answer:"Sobald / Wenn" },
+          { template:"________ überprüft man das Ergebnis.", answer:"Zum Schluss / Abschließend / Schließlich" },
+        ]},
+      { id:"11b", type:"text", question:"Diktier-Übung: Schreibe diese 5 Sätze aus dem Gedächtnis auf (lies sie zuerst 3x durch, dann schreibe ohne zu schauen):\n\n1. Zunächst entnimmt man die Zutaten aus dem Kühlschrank.\n2. Anschließend werden die Zutaten sorgfältig abgewogen.\n3. Im nächsten Schritt vermengt man alles gleichmäßig.\n4. Währenddessen wird der Ofen auf 180 Grad vorgeheizt.\n5. Abschließend überprüft man das Ergebnis.", placeholder:"Schreibe die 5 Sätze aus dem Gedächtnis:\n1. ...\n2. ...\n3. ...\n4. ...\n5. ...", aiCheck:true, aiPrompt:`Klasse 6 Diktier-Übung. Die richtigen Sätze sind: 1. "Zunächst entnimmt man die Zutaten aus dem Kühlschrank." 2. "Anschließend werden die Zutaten sorgfältig abgewogen." 3. "Im nächsten Schritt vermengt man alles gleichmäßig." 4. "Währenddessen wird der Ofen auf 180 Grad vorgeheizt." 5. "Abschließend überprüft man das Ergebnis." Vergleiche und zeige genau welche Wörter falsch waren. Besonders auf: anschließend/schließlich/währenddessen/gleichmäßig achten. Auf Deutsch.` }
+    ]
+  },
+  {
+    id:12, week:2, weekday:"Freitag", title:"PROBETEST — wie in der echten Arbeit!", type:"test",
+    intro:`<strong>Achtung — das ist ein echter Probetest!</strong> Keine Notizen, keine Hilfe, 30 Minuten Zeit. Danach bewertet Claude deinen Text wie ein Lehrer.`,
+    example:`Denk daran:<br>✦ Erst lesen, dann schreiben<br>✦ Immer Präsens + man überprüfen<br>✦ Verbindungswörter einbauen<br>✦ Am Ende nochmal durchlesen!`,
+    exercises:[
+      { id:"12a", type:"fill", question:"Teil 1 — Grammatik (ohne Hilfe!):",
+        items:[
+          { template:"man ________ (nehmen)", answer:"nimmt" },
+          { template:"man ________ (mischen)", answer:"mischt" },
+          { template:"Man öffnet die Tür. →  Die Tür ________ (Passiv)", answer:"wird geöffnet" },
+          { template:"Fehler korrigieren: 'Ich gehe zum nächsten Schritt.'  →", answer:"Man geht / Man schreitet" },
+        ]},
+      { id:"12b", type:"text", question:"Teil 2 — Vorgangsbeschreibung (20 Punkte)\n\nThema: Wie bereitet man einen einfachen Obstsalat zu?\n\nSchreibe eine vollständige Vorgangsbeschreibung (mindestens 8 Sätze). Zeig alles, was du gelernt hast!", placeholder:"Im Folgenden wird beschrieben, ...\n\n...", aiCheck:true, aiPrompt:`Du bist ein Deutschlehrer für Klasse 6 und bewertest einen Probetest. Sei wie ein echter Lehrer: streng aber fair.\n\nBewerte:\n1. Note (1–6) mit klarer Begründung\n2. Stärken (konkret)\n3. Fehler (T/A/Sr/Wc/R mit je einem Beispiel aus dem Text)\n4. Gesamteindruck: ist der Schüler bereit für den Test?\n\nAuf Deutsch, max 12 Sätze.` }
+    ]
+  },
+  {
+    id:13, week:2, weekday:"Samstag", title:"Letzte Wiederholung vor dem Test", type:"writing",
+    intro:`Letzte Übung vor dem Test! Schreib deinen <strong>besten Text bisher</strong> — zeig alles, was du gelernt hast.`,
+    example:`Vollständige Checkliste:<br>☑ Zeitform = Präsens (man nimmt / wird gemacht)<br>☑ Pronomen = man / Passiv<br>☑ Aufbau = Einleitung + Hauptteil + Schluss<br>☑ Verbindungswörter = zuerst / dann / danach / anschließend / zum Schluss<br>☑ Starke Verben = kontrollieren / entnehmen / vermengen<br>☑ Rechtschreibung = anschließend / schließlich / währenddessen`,
+    exercises:[
+      { id:"13a", type:"text", question:"Letzte Übung vor dem Test!\n\nThema: Wie schreibt man einen Brief?\n\nSchreibe deine beste Vorgangsbeschreibung (mindestens 8 Sätze). Zeig alles, was du in 2 Wochen gelernt hast!", placeholder:"Im Folgenden wird beschrieben, wie man einen Brief schreibt.\n\n...", aiCheck:true, aiPrompt:`Klasse 6, letzte Übung vor dem Deutschtest. Bewerte wie ein Lehrer der wirklich helfen will:\n1. Note 1-6\n2. Was ist schon sehr gut?\n3. Was musst du morgen beim Test UNBEDINGT aufpassen?\n4. Bist du bereit?\nAuf Deutsch, ermutigend, motivierend, max 8 Sätze.` }
+    ]
+  },
+  {
+    id:14, week:2, weekday:"Sonntag", title:"Ruhetag vor dem Test 🌟", type:"rest",
+    intro:"", example:"", exercises:[]
+  }
+];
+
+const TYPE_LABELS = { theory:"Theorie", grammar:"Grammatik", writing:"Schreiben", test:"Probetest", rest:"Ruhetag" };
+const TYPE_CLASSES = { theory:"type-theory", grammar:"type-grammar", writing:"type-writing", test:"type-test", rest:"type-rest" };
+
+// ─── STATE ───────────────────────────────────────────────────────────────────
+let state = JSON.parse(localStorage.getItem('deutsch_state') || '{}');
+// state[dayId] = { completed: bool, exercises: { exId: { answer, feedback, passed } } }
+let currentDay = parseInt(localStorage.getItem('deutsch_current') || '1');
+
+function save() {
+  localStorage.setItem('deutsch_state', JSON.stringify(state));
+  localStorage.setItem('deutsch_current', String(currentDay));
+}
+
+// ─── SIDEBAR ────────────────────────────────────────────────────────────────
+function buildSidebar() {
+  const container = document.getElementById('sidebar-days');
+  container.innerHTML = '';
+  let week = 0;
+  DAYS.forEach(day => {
+    if (day.week !== week) {
+      week = day.week;
+      const wlabel = document.createElement('div');
+      wlabel.className = 'week-section';
+      wlabel.innerHTML = `<div class="week-label">Woche ${week}</div>`;
+      container.appendChild(wlabel);
+    }
+    const btn = document.createElement('button');
+    const isDone = state[day.id]?.completed;
+    btn.className = `day-btn ${isDone ? 'completed' : ''} ${currentDay === day.id ? 'active' : ''} ${day.type === 'rest' ? 'rest-day' : ''}`;
+    btn.innerHTML = `<div class="day-num">${isDone ? '✓' : day.id}</div><div class="day-info"><div class="day-name">${day.weekday}</div><div class="day-topic">${day.title}</div></div>`;
+    btn.onclick = () => { currentDay = day.id; save(); buildSidebar(); renderDay(day.id); };
+    container.querySelector('.week-section:last-child').appendChild(btn);
+  });
+  updateGlobalProgress();
+}
+
+function updateGlobalProgress() {
+  const done = DAYS.filter(d => state[d.id]?.completed).length;
+  const pct = Math.round(done / DAYS.length * 100);
+  document.getElementById('global-prog').style.width = pct + '%';
+  document.getElementById('global-prog-text').textContent = `${done} von ${DAYS.length} Tagen abgeschlossen`;
+}
+
+// ─── MAIN RENDER ─────────────────────────────────────────────────────────────
+function renderDay(dayId) {
+  const day = DAYS.find(d => d.id === dayId);
+  const main = document.getElementById('main-content');
+
+  if (day.type === 'rest') {
+    main.innerHTML = `
+      <div class="rest-screen">
+        <div class="emoji">😴</div>
+        <h3>Ruhetag!</h3>
+        <p>Heute kein Lernen. Das Gehirn braucht Pausen, um das Gelernte zu festigen. Erhol dich gut!</p>
+        <br><br>
+        ${day.id === 7 ? `<div style="background:var(--green-light);border-radius:12px;padding:20px;max-width:400px;margin:0 auto;text-align:left;font-size:14px;color:var(--green);"><strong>Was du diese Woche gelernt hast:</strong><br>✦ Was eine Vorgangsbeschreibung ist<br>✦ Präsens mit 'man'<br>✦ Verbindungswörter<br>✦ Rechtschreibung: anschließend / schließlich / währenddessen<br>✦ Passiv: wird gemacht / werden gemischt</div>` : `<div style="background:var(--orange-light);border-radius:12px;padding:20px;max-width:400px;margin:0 auto;text-align:left;font-size:14px;color:var(--orange);"><strong>Morgen ist der Test! Lies kurz durch:</strong><br>✦ Präsens: man nimmt / man mischt<br>✦ Passiv: wird gemacht / werden gemischt<br>✦ Verbindungswörter: zuerst / dann / anschließend / zum Schluss<br>✦ KEIN 'ich' oder 'wir'<br>✦ Einleitung + Hauptteil + Schluss<br><br><strong style="color:var(--green)">Du hast 2 Wochen geübt. Du schaffst das! 🌟</strong></div>`}
+      </div>`;
+    if (!state[dayId]) state[dayId] = {};
+    state[dayId].completed = true;
+    save(); buildSidebar();
+    return;
+  }
+
+  const dayState = state[dayId] || {};
+  const allDone = day.exercises.every(ex => dayState.exercises?.[ex.id]?.passed);
+
+  main.innerHTML = `
+    <div class="day-header-bar">
+      <div class="week-tag">Woche ${day.week} · Tag ${day.id}</div>
+      <h2>${day.weekday}: ${day.title}</h2>
+      <div><span class="type-badge ${TYPE_CLASSES[day.type]}">${TYPE_LABELS[day.type]}</span></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">📖</span> Deine Lektion heute</div>
+      <div class="lesson-text">${day.intro}</div>
+      ${day.example ? `<div class="example-block" style="margin-top:12px">${day.example}</div>` : ''}
+    </div>
+
+    ${day.rules ? `<div class="card"><div class="card-title"><span class="icon">📋</span> Die Regeln</div><div class="rule-block">${day.rules.map((r,i) => `<div class="rule-item"><span class="rule-num">${i+1}.</span><span>${r}</span></div>`).join('')}</div></div>` : ''}
+
+    <div id="exercises-area">${renderExercises(day, dayState)}</div>
+
+    ${allDone ? renderCompleteScreen(dayId) : ''}
+  `;
+}
+
+function renderExercises(day, dayState) {
+  return day.exercises.map((ex, idx) => {
+    const exState = dayState.exercises?.[ex.id] || {};
+    const passed = exState.passed;
+    return `<div class="exercise-card ${passed ? 'submitted' : ''}" id="ex-${ex.id}">
+      <div class="ex-title">
+        <span style="background:var(--text);color:#fff;border-radius:50%;width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0">${idx+1}</span>
+        Aufgabe ${idx+1}
+        ${passed ? '<span style="color:var(--green);font-size:13px;margin-left:auto">✓ Erledigt</span>' : ''}
+      </div>
+      <div class="ex-question" style="white-space:pre-line">${ex.question}</div>
+      ${renderExerciseInput(ex, exState)}
+      ${exState.feedback ? `<div class="feedback-box ${exState.passed ? 'feedback-good' : 'feedback-ok'}">
+        <div class="feedback-header">${exState.passed ? '✓ Gut gemacht!' : '↻ Noch üben'}</div>
+        <div class="feedback-body">${exState.feedback}</div>
+      </div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function renderExerciseInput(ex, exState) {
+  if (ex.type === 'mcq') {
+    const sel = exState.selected;
+    return `<div id="mcq-${ex.id}">${ex.options.map((opt,i) => {
+      let cls = 'mcq-option';
+      if (sel !== undefined) { if (i === ex.correct) cls += ' correct'; else if (i === sel && sel !== ex.correct) cls += ' wrong'; }
+      else if (i === sel) cls += ' selected';
+      return `<div class="${cls}" ${sel === undefined ? `onclick="selectMCQ('${ex.id}',${i},${ex.correct},'${escQ(ex.feedback_correct)}','${escQ(ex.feedback_wrong)}')"` : ''}>
+        <div class="mcq-dot"></div><span>${opt}</span></div>`;
+    }).join('')}</div>`;
+  }
+  if (ex.type === 'fill') {
+    const items = ex.items.map((item, i) => `
+      <div class="fill-line">${item.template} <input class="answer-field-inline" id="fill-${ex.id}-${i}" value="${exState.fills?.[i] || ''}" placeholder="..." ${exState.passed ? 'disabled' : ''} /></div>
+    `).join('');
+    return `<div>${items}</div>
+      ${!exState.passed ? `<button class="submit-btn" onclick="checkFill('${ex.id}')">Überprüfen</button>` : ''}`;
+  }
+  if (ex.type === 'text') {
+    return `<textarea class="answer-field" id="text-${ex.id}" placeholder="${ex.placeholder || ''}" ${exState.passed ? 'disabled style="opacity:0.7"' : ''}>${exState.answer || ''}</textarea>
+      ${!exState.passed ? `<button class="submit-btn" id="btn-${ex.id}" onclick="submitText('${ex.id}')"><span>Claude überprüft ✦</span></button>` : ''}`;
+  }
+  return '';
+}
+
+function renderCompleteScreen(dayId) {
+  const nextDay = DAYS.find(d => d.id === dayId + 1);
+  return `<div class="day-complete-banner">
+    <h3>🎉 Tag ${dayId} abgeschlossen!</h3>
+    <p>Sehr gut! Du hast alle Aufgaben heute erledigt.</p>
+    ${nextDay ? `<button class="next-day-btn" onclick="goToDay(${nextDay.id})">Weiter zu Tag ${nextDay.id}: ${nextDay.weekday} →</button>` : '<p style="color:#fff;margin-top:10px;font-weight:800">Du hast alle 14 Tage abgeschlossen! 🌟</p>'}
+  </div>`;
+}
+
+function escQ(s) { return s.replace(/'/g,"&#39;").replace(/"/g,'&quot;'); }
+
+// ─── INTERACTIONS ─────────────────────────────────────────────────────────────
+function selectMCQ(exId, selected, correct, feedbackCorrect, feedbackWrong) {
+  const day = DAYS.find(d => d.exercises?.some(e => e.id === exId));
+  if (!day) return;
+  if (!state[day.id]) state[day.id] = {};
+  if (!state[day.id].exercises) state[day.id].exercises = {};
+  const passed = selected === correct;
+  state[day.id].exercises[exId] = { selected, passed, feedback: passed ? feedbackCorrect : feedbackWrong };
+  save();
+  checkDayComplete(day.id);
+  renderDay(currentDay);
+}
+
+function checkFill(exId) {
+  const day = DAYS.find(d => d.exercises?.some(e => e.id === exId));
+  const ex = day.exercises.find(e => e.id === exId);
+  const fills = ex.items.map((item, i) => document.getElementById(`fill-${exId}-${i}`)?.value?.trim() || '');
+  let correct = 0;
+  const results = ex.items.map((item, i) => {
+    const ans = fills[i].toLowerCase();
+    const acceptable = item.answer.toLowerCase().split('/').map(a => a.trim());
+    return acceptable.some(a => ans.includes(a) || a.includes(ans));
+  });
+  correct = results.filter(Boolean).length;
+  if (!state[day.id]) state[day.id] = {};
+  if (!state[day.id].exercises) state[day.id].exercises = {};
+  const passed = correct >= Math.ceil(ex.items.length * 0.75);
+  const feedback = passed
+    ? `Super! ${correct} von ${ex.items.length} Antworten richtig! ${correct < ex.items.length ? 'Fast perfekt!' : 'Alles richtig!'}`
+    : `${correct} von ${ex.items.length} richtig. Richtige Antworten: ${ex.items.map(it => it.answer).join(' / ')}. Versuch es nochmal!`;
+  state[day.id].exercises[exId] = { fills, passed, feedback };
+  save();
+  checkDayComplete(day.id);
+  renderDay(currentDay);
+}
+
+async function submitText(exId) {
+  const day = DAYS.find(d => d.exercises?.some(e => e.id === exId));
+  const ex = day.exercises.find(e => e.id === exId);
+  const answer = document.getElementById(`text-${exId}`)?.value?.trim();
+  if (!answer || answer.length < 20) { alert('Bitte schreibe erst deine Antwort!'); return; }
+
+  const btn = document.getElementById(`btn-${exId}`);
+  btn.innerHTML = '<div class="spinner"></div><span>Claude prüft...</span>';
+  btn.disabled = true;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: "Du bist ein freundlicher Deutschlehrer für Klasse 6 in Deutschland. Antworte immer auf Deutsch. Sei ermutigend aber ehrlich und klar.",
+        messages: [{ role: 'user', content: `${ex.aiPrompt}\n\nAntwort des Schülers:\n${answer}` }]
+      })
+    });
+    const data = await res.json();
+    const feedback = data.content?.[0]?.text || 'Fehler beim Laden des Feedbacks.';
+    const passed = !feedback.includes('Note: 5') && !feedback.includes('Note: 6') && !feedback.includes('Note 5') && !feedback.includes('Note 6');
+
+    if (!state[day.id]) state[day.id] = {};
+    if (!state[day.id].exercises) state[day.id].exercises = {};
+    state[day.id].exercises[exId] = { answer, feedback, passed: true };
+    save();
+    checkDayComplete(day.id);
+    renderDay(currentDay);
+  } catch(e) {
+    btn.innerHTML = '<span>Claude überprüft ✦</span>';
+    btn.disabled = false;
+    const fb = document.createElement('div');
+    fb.style.cssText = 'margin-top:10px;padding:10px;background:var(--red-light);border-radius:8px;font-size:13px;color:var(--red)';
+    fb.textContent = 'Verbindungsfehler. Bitte stelle sicher, dass du mit dem Internet verbunden bist und versuch es nochmal.';
+    btn.parentNode.insertBefore(fb, btn.nextSibling);
+  }
+}
+
+function checkDayComplete(dayId) {
+  const day = DAYS.find(d => d.id === dayId);
+  if (!day) return;
+  const dayState = state[dayId] || {};
+  const allDone = day.exercises.every(ex => dayState.exercises?.[ex.id]?.passed);
+  if (allDone && day.exercises.length > 0) {
+    if (!state[dayId]) state[dayId] = {};
+    state[dayId].completed = true;
+    save();
+  }
+}
+
+function goToDay(id) {
+  currentDay = id;
+  save();
+  buildSidebar();
+  renderDay(id);
+  window.scrollTo(0,0);
+}
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+buildSidebar();
+renderDay(currentDay);
+</script>
+</body>
+</html>
